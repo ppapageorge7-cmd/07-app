@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>07 App - Phone Detox Challenge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app-container {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 18px;
+        }
+
+        .challenge-setup {
+            margin-bottom: 30px;
+        }
+
+        .challenge-setup label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .duration-options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .duration-btn {
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .duration-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .duration-btn.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .duration-btn .time {
+            font-size: 24px;
+            font-weight: bold;
+            display: block;
+        }
+
+        .duration-btn .label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .start-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .start-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Challenge Screen & Success Screen (hidden by default) */
+        .challenge-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .challenge-screen.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .timer-display {
+            font-size: 96px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 40px 0;
+        }
+
+        .challenge-message {
+            font-size: 20px;
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
+        .action-buttons {
+            display: grid;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .stats-display {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            font-size: 18px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        /* Success Screen Specific Styles */
+        .success-box {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .points-earned-display {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .points-earned-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: #10b981;
+        }
+
+        .total-stats {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Setup Screen -->
+        <div id="setupScreen" class="setup-screen">
+            <div class="header">
+                <h1>07 📱</h1>
+                <p>Challenge yourself to put your phone down</p>
+            </div>
+
+            <!-- ✅ NEW: Quick Stats Preview -->
+        <div style="background: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 20px; display: flex; justify-content: space-around; text-align: center;">
+            <div>
+                <div style="font-size: 24px; font-weight: bold; color: #667eea;" id="homePoints">0</div>
+                <div style="font-size: 12px; color: #64748b;">Points</div>
+            </div>
+            <div>
+                <div style="font-size: 24px; font-weight: bold; color: #10b981;" id="homeSuccessRate">0%</div>
+                <div style="font-size: 12px; color: #64748b;">Success</div>
+            </div>
+            <div>
+                <div style="font-size: 24px; font-weight: bold; color: #64748b;" id="homeChallenges">0</div>
+                <div style="font-size: 12px; color: #64748b;">Challenges</div>
+            </div>
+        </div>
+            <div class="challenge-setup">
+                <!-- ✅ NEW: Platform Selector -->
+                <label>Platform Mode (Demo):</label>
+                <div class="duration-options" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
+                    <div class="duration-btn selected" onclick="selectPlatform('web', this)" id="platformWeb">
+                        <span class="time">🌐</span>
+                        <span class="label">Web</span>
+                    </div>
+                    <div class="duration-btn" onclick="selectPlatform('android', this)" id="platformAndroid">
+                        <span class="time">🤖</span>
+                        <span class="label">Android</span>
+                    </div>
+                    <div class="duration-btn" onclick="selectPlatform('ios', this)" id="platformIOS">
+                        <span class="time">🍎</span>
+                        <span class="label">iOS</span>
+                    </div>
+                </div>
+                <label>Choose Duration:</label>
+                <div class="duration-options">
+                    <div class="duration-btn selected" onclick="selectDuration(7, this)">
+                        <span class="time">7</span>
+                        <span class="label">minutes</span>
+                    </div>
+                    <div class="duration-btn" onclick="selectDuration(10, this)">
+                        <span class="time">10</span>
+                        <span class="label">minutes</span>
+                    </div>
+                    <div class="duration-btn" onclick="selectDuration(15, this)">
+                        <span class="time">15</span>
+                        <span class="label">minutes</span>
+                    </div>
+                    <div class="duration-btn" onclick="selectDuration(20, this)">
+                        <span class="time">20</span>
+                        <span class="label">minutes</span>
+                    </div>
+                    <div class="duration-btn" onclick="selectDuration(30, this)">
+                        <span class="time">30</span>
+                        <span class="label">minutes</span>
+                    </div>
+                </div>
+
+                <button class="start-btn" onclick="startChallenge()">
+                    🎯 Solo Challenge
+                </button>
+
+                <button class="start-btn" onclick="showComingSoon()" style="background: #94a3b8; margin-top: 10px;">
+                    👥 Challenge with Friends
+                    <div style="font-size: 14px; font-weight: normal; margin-top: 5px;">Coming Soon!</div>
+                </button>
+
+                <!-- ΕΔΩ ΕΙΝΑΙ! ✅ -->
+                <button class="start-btn" onclick="showStats()" style="background: linear-gradient(135deg, #10b981, #059669); margin-top: 10px;">
+                    📊 View Stats
+                </button>
+              </div>
+        </div>
+
+        <!-- Challenge Screen (hidden initially) -->
+        <div id="challengeScreen" class="challenge-screen">
+            <div class="header">
+                <h1>📱 Challenge Active</h1>
+                <p class="challenge-message">Put your phone down!</p>
+            </div>
+
+            <div class="timer-display" id="timerDisplay">
+                7:00
+            </div>
+
+            <div class="stats-display">
+                <div class="stat-item">
+                    <div class="stat-value" style="color: #667eea;" id="pointsDisplay">0</div>
+                    <div class="stat-label">Points</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" style="color: #ef4444;" id="violationsDisplay">0</div>
+                    <div class="stat-label">Violations</div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="pauseTimer()" id="pauseBtn">
+                    ⏸️ Pause
+                </button>
+                <button class="btn btn-danger" onclick="reportViolation()">
+                    ⚠️ I Picked Up My Phone
+                </button>
+                <button class="btn btn-secondary" onclick="endChallenge()">
+                    End Challenge
+                </button>
+            </div>
+        </div>
+
+        <!-- Success Screen (hidden initially) -->
+        <div id="successScreen" class="challenge-screen">
+            <div class="header">
+                <h1 id="successEmoji" style="font-size: 96px; margin-bottom: 10px;">🎉</h1>
+                <h2 id="successTitle" style="color: #667eea; font-size: 32px; margin-bottom: 10px;">Challenge Complete!</h2>
+                <p id="successMessage" style="color: #64748b; font-size: 18px;">You did it!</p>
+            </div>
+
+            <div class="success-box">
+                <div class="points-earned-display">
+                    <div class="points-earned-value" id="pointsEarned">+25</div>
+                    <div style="color: #64748b; font-size: 18px;">Points Earned</div>
+                </div>
+
+                <div class="total-stats">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #667eea;" id="successTotalPoints">0</div>
+                        <div style="color: #64748b;">Total Points</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #ef4444;" id="successTotalViolations">0</div>
+                        <div style="color: #64748b;">Total Violations</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="start-btn" onclick="startNewChallenge()">
+                🚀 Start New Challenge
+            </button>
+            <!-- ✅ NEW: Stats Button -->
+                <button class="start-btn" onclick="showStats()" style="background: linear-gradient(135deg, #10b981, #059669); margin-top: 10px;">
+                    📊 View Stats
+                </button>
+        </div>
+        <!-- ✅ NEW: Stats Screen -->
+        <div id="statsScreen" class="challenge-screen">
+            <div class="header">
+                <h1 style="font-size: 64px;">📊</h1>
+                <h2 style="color: #667eea; font-size: 32px; margin-bottom: 10px;">Your Statistics</h2>
+            </div>
+
+            <div style="background: #f8fafc; border-radius: 16px; padding: 30px; margin: 30px 0;">
+                
+                <!-- Total Challenges -->
+                <div style="text-align: center; margin-bottom: 30px; padding-bottom: 30px; border-bottom: 2px solid #e2e8f0;">
+                    <div style="font-size: 48px; font-weight: bold; color: #667eea;" id="statsTotalChallenges">0</div>
+                    <div style="color: #64748b; font-size: 18px;">Total Challenges</div>
+                </div>
+
+                <!-- Success Rate -->
+                <div style="text-align: center; margin-bottom: 30px; padding-bottom: 30px; border-bottom: 2px solid #e2e8f0;">
+                    <div style="font-size: 48px; font-weight: bold; color: #10b981;" id="statsSuccessRate">0%</div>
+                    <div style="color: #64748b; font-size: 18px;">Success Rate</div>
+                    <div style="margin-top: 10px; font-size: 14px; color: #94a3b8;">
+                        <span id="statsCompleted">0</span> completed out of <span id="statsTotal">0</span>
+                    </div>
+                </div>
+
+                <!-- Grid Stats -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 32px; font-weight: bold; color: #667eea;" id="statsTotalPoints">0</div>
+                        <div style="color: #64748b;">Total Points</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 32px; font-weight: bold; color: #ef4444;" id="statsTotalViolations">0</div>
+                        <div style="color: #64748b;">Total Violations</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div style="display: grid; gap: 10px;">
+                <button class="start-btn" onclick="closeStats()">
+                    ← Back to Home
+                </button>
+                <button class="btn btn-danger" onclick="resetAllData()" style="width: 100%; padding: 15px; border-radius: 12px;">
+                    🔄 Reset All Data
+                </button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        // State variables
+        let selectedDuration = 7;
+        let timeRemaining = 0;
+        let timerInterval = null;
+        let isPaused = false;
+        let totalPoints = 0;
+        let totalViolations = 0;
+        let totalChallenges = 0;        // ✅ NEW
+        let completedChallenges = 0;    // ✅ NEW
+        let challengeEndTime = null;  // ✅ NEW - Timestamp when challenge should end
+
+        // ✅ NEW: Platform & Visibility Detection
+        let userPlatform = 'web';  // 'web', 'android', 'ios'
+        let tabLeftTime = null;
+        let wasTabHidden = false;
+
+        // ✅ NEW: localStorage Functions
+        function saveData() {
+            localStorage.setItem('totalPoints', totalPoints);
+            localStorage.setItem('totalViolations', totalViolations);
+            localStorage.setItem('totalChallenges', totalChallenges);
+            localStorage.setItem('completedChallenges', completedChallenges);
+        }
+
+        function loadData() {
+            // Load από localStorage (αν υπάρχει)
+            let savedPoints = localStorage.getItem('totalPoints');
+            let savedViolations = localStorage.getItem('totalViolations');
+            let savedTotalChallenges = localStorage.getItem('totalChallenges');
+            let savedCompleted = localStorage.getItem('completedChallenges');
+            
+            // Αν υπάρχουν saved data, φόρτωσέ τα
+            if (savedPoints !== null) {
+                totalPoints = parseInt(savedPoints);
+            }
+            if (savedViolations !== null) {
+                totalViolations = parseInt(savedViolations);
+            }
+            if (savedTotalChallenges !== null) {
+                totalChallenges = parseInt(savedTotalChallenges);
+            }
+            if (savedCompleted !== null) {
+                completedChallenges = parseInt(savedCompleted);
+            }
+
+            // ✅ Update home screen stats preview
+            document.getElementById('homePoints').textContent = totalPoints;
+            document.getElementById('homeChallenges').textContent = totalChallenges;
+            
+            let successRate = 0;
+            if (totalChallenges > 0) {
+                successRate = Math.round((completedChallenges / totalChallenges) * 100);
+            }
+            document.getElementById('homeSuccessRate').textContent = successRate + '%';
+            
+            
+            // Update τα displays
+            updateAllDisplays();
+            updateHomeStats();  // ✅ NEW!
+        }
+
+        function updateAllDisplays() {
+            // Update όλα τα displays με τα current data
+            document.getElementById('pointsDisplay').textContent = totalPoints;
+            document.getElementById('violationsDisplay').textContent = totalViolations;
+        }
+
+        function updateHomeStats() {
+            // Update home screen stats preview
+            const homePoints = document.getElementById('homePoints');
+            const homeChallenges = document.getElementById('homeChallenges');
+            const homeSuccessRate = document.getElementById('homeSuccessRate');
+            
+            // Check αν υπάρχουν (γιατί μπορεί να μην έχεις προσθέσει το preview ακόμα)
+            if (homePoints) {
+                homePoints.textContent = totalPoints;
+            }
+            if (homeChallenges) {
+                homeChallenges.textContent = totalChallenges;
+            }
+            if (homeSuccessRate) {
+                let successRate = 0;
+                if (totalChallenges > 0) {
+                    successRate = Math.round((completedChallenges / totalChallenges) * 100);
+                }
+                homeSuccessRate.textContent = successRate + '%';
+            }
+        }
+        function resetAllData() {
+            if (confirm('Are you sure you want to reset ALL data? This cannot be undone!')) {
+                localStorage.clear();
+                totalPoints = 0;
+                totalViolations = 0;
+                totalChallenges = 0;
+                completedChallenges = 0;
+                updateAllDisplays();
+                updateHomeStats();  // ✅ NEW!
+                /// ✅ HIDE all screens
+                document.getElementById('statsScreen').classList.remove('active');
+                document.getElementById('challengeScreen').classList.remove('active');
+                document.getElementById('successScreen').classList.remove('active');
+        
+                // ✅ SHOW setup screen
+                document.getElementById('setupScreen').style.display = 'block';
+                alert('All data has been reset!');
+            }
+        }
+
+        function showStats() {
+            // ✅ HIDE setup screen completely
+            const setupScreen = document.getElementById('setupScreen');
+            setupScreen.style.display = 'none';
+            
+            // ✅ HIDE challenge screen (in case it's showing)
+            document.getElementById('challengeScreen').classList.remove('active');
+            
+            // ✅ HIDE success screen (in case it's showing)
+            document.getElementById('successScreen').classList.remove('active');
+            
+            // ✅ SHOW stats screen
+            document.getElementById('statsScreen').classList.add('active');
+            
+            // Calculate success rate
+            let successRate = 0;
+            if (totalChallenges > 0) {
+                successRate = Math.round((completedChallenges / totalChallenges) * 100);
+            }
+            
+            // Update stats displays
+            document.getElementById('statsTotalChallenges').textContent = totalChallenges;
+            document.getElementById('statsSuccessRate').textContent = successRate + '%';
+            document.getElementById('statsCompleted').textContent = completedChallenges;
+            document.getElementById('statsTotal').textContent = totalChallenges;
+            document.getElementById('statsTotalPoints').textContent = totalPoints;
+            document.getElementById('statsTotalViolations').textContent = totalViolations;
+        }
+
+        function closeStats() {
+            // Hide stats screen
+            document.getElementById('statsScreen').classList.remove('active');
+            
+            // Show setup screen
+            document.getElementById('setupScreen').style.display = 'block';
+
+            // ✅ Make sure other screens are hidden
+            document.getElementById('challengeScreen').classList.remove('active');
+            document.getElementById('successScreen').classList.remove('active');
+
+            updateHomeStats();  // ✅ NEW!
+        }
+
+        function showTabChangeWarning(type) {
+            // Create warning overlay
+            let warning = document.createElement('div');
+            warning.id = 'tabWarning';
+            warning.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                text-align: center;
+                padding: 20px;
+            `;
+            
+            let content = '';
+            
+            if (type === 'web') {
+                content = `
+                    <div>
+                        <div style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
+                        <h2 style="font-size: 32px; margin-bottom: 20px;">Tab Changed!</h2>
+                        <p style="font-size: 18px; margin-bottom: 20px; opacity: 0.9;">
+                            You switched tabs during the challenge.<br>
+                            Timer has been automatically paused.
+                        </p>
+                        <p style="font-size: 16px; opacity: 0.7;">
+                            Click Resume when you're ready to continue.
+                        </p>
+                    </div>
+                `;
+            } else if (type === 'ios-violation') {
+                content = `
+                    <div>
+                        <div style="font-size: 64px; margin-bottom: 20px;">🍎</div>
+                        <h2 style="font-size: 32px; margin-bottom: 20px; color: #ef4444;">iOS Violation Detected!</h2>
+                        <p style="font-size: 18px; margin-bottom: 20px;">
+                            You returned to the app before the challenge ended.
+                        </p>
+                        <p style="font-size: 16px; opacity: 0.8;">
+                            On iOS, you must stay away for the full duration!
+                        </p>
+                    </div>
+                `;
+            }
+            
+            warning.innerHTML = content;
+            document.body.appendChild(warning);
+            
+            // Auto-remove after 3 seconds (except for web pause)
+            if (type !== 'web') {
+                setTimeout(() => {
+                    if (warning.parentElement) {
+                        warning.remove();
+                    }
+                }, 3000);
+            } else {
+                // For web, remove when user resumes
+                warning.onclick = () => warning.remove();
+            }
+        }
+
+        // Select duration function
+        function selectDuration(minutes, element) {
+            selectedDuration = minutes;
+            
+            document.querySelectorAll('.duration-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            element.classList.add('selected');
+        }
+
+        function selectPlatform(platform, element) {
+            userPlatform = platform;
+            
+            // Update UI
+            document.querySelectorAll('#platformWeb, #platformAndroid, #platformIOS').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            
+            // Show info about selected platform
+            let info = '';
+            if (platform === 'web') {
+                info = '🌐 Web: Tab change pauses timer. Honor system + warnings.';
+            } else if (platform === 'android') {
+                info = '🤖 Android: Tab change = automatic violation. Full detection!';
+            } else if (platform === 'ios') {
+                info = '🍎 iOS: Return before time ends = violation. Lock screen OK.';
+            }
+            
+            console.log('Platform selected:', platform);
+            console.log(info);
+        }
+
+        // Start challenge function
+        function startChallenge() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            isPaused = false;
+            
+            document.getElementById('setupScreen').style.display = 'none';
+            document.getElementById('challengeScreen').classList.add('active');
+            
+            // ✅ NEW: Calculate exact end time
+            challengeEndTime = Date.now() + (selectedDuration * 60 * 1000);
+            // Date.now() = τώρα σε milliseconds
+            // selectedDuration * 60 * 1000 = λεπτά σε milliseconds
+            
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                updateTimerDisplay();
+                
+                // ✅ NEW: Check based on actual time, not counter
+                let now = Date.now();
+                if (now >= challengeEndTime) {
+                    completeChallenge();
+                }
+            }, 100);   // ✅ Check every 100ms for more accuracy
+        }
+
+        // Update timer display function
+        function updateTimerDisplay() {
+            // ✅ NEW: Calculate time remaining based on timestamps
+            let now = Date.now();
+            timeRemaining = Math.max(0, Math.ceil((challengeEndTime - now) / 1000));
+
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            const display = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+            document.getElementById('timerDisplay').textContent = display;
+        }
+
+        // Pause/Resume timer function
+        function pauseTimer() {
+            if (isPaused) {
+                isPaused = false;
+                
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                }
+                // ✅ NEW: Recalculate end time based on remaining seconds
+                challengeEndTime = Date.now() + (timeRemaining * 1000);
+
+                timerInterval = setInterval(() => {
+                    updateTimerDisplay();
+                    
+                    let now = Date.now();
+                    if (now >= challengeEndTime) {
+                        completeChallenge();
+                    }
+                }, 100);;
+                
+                document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            } else {
+                isPaused = true;
+                clearInterval(timerInterval);
+                // ✅ NEW: Update timeRemaining based on current time
+                updateTimerDisplay();
+                document.getElementById('pauseBtn').textContent = '▶️ Resume';
+            }
+        }
+
+        // Complete challenge function
+        function completeChallenge() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            
+            // Points για τα 5 durations
+            let pointsEarned = 0;
+            if (selectedDuration === 7) {
+                pointsEarned = 25;
+            } else if (selectedDuration === 10) {
+                pointsEarned = 35;
+            } else if (selectedDuration === 15) {
+                pointsEarned = 50;
+            } else if (selectedDuration === 20) {
+                pointsEarned = 100;
+            } else if (selectedDuration === 30) {
+                pointsEarned = 150;
+            }
+            
+            totalPoints = totalPoints + pointsEarned;
+            totalChallenges = totalChallenges + 1;
+            completedChallenges = completedChallenges + 1;
+            
+            document.getElementById('pointsDisplay').textContent = totalPoints;
+            
+            saveData();
+            updateHomeStats();  // ✅ NEW!
+            showSuccessScreen(pointsEarned, true);
+        }
+
+        // Report violation function
+        function reportViolation() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            
+            totalViolations = totalViolations + 1;
+            totalChallenges = totalChallenges + 1;  // ✅ NEW
+            document.getElementById('violationsDisplay').textContent = totalViolations;
+            saveData();  // ✅ NEW - Save after violation!
+            updateHomeStats();  // ✅ NEW!
+            console.log('🚨 Violation recorded - Platform:', userPlatform);  // ✅ NEW
+            
+            showSuccessScreen(0, false);
+        }
+
+        // End challenge function
+        function endChallenge() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            showSuccessScreen(0, false);
+        }
+
+        // Show success screen function
+        function showSuccessScreen(pointsEarned, success) {
+            document.getElementById('challengeScreen').classList.remove('active');
+            document.getElementById('successScreen').classList.add('active');
+            
+            if (success) {
+                document.getElementById('successEmoji').textContent = '🎉';
+                document.getElementById('successTitle').textContent = 'Challenge Complete!';
+                document.getElementById('successMessage').textContent = 'You did it! Great job!';
+                document.getElementById('pointsEarned').textContent = '+' + pointsEarned;
+                document.getElementById('pointsEarned').style.color = '#10b981';
+            } else {
+                document.getElementById('successEmoji').textContent = '😔';
+                document.getElementById('successTitle').textContent = 'Challenge Failed';
+                document.getElementById('successMessage').textContent = 'Better luck next time!';
+                document.getElementById('pointsEarned').textContent = '+0';
+                document.getElementById('pointsEarned').style.color = '#ef4444';
+            }
+            
+            document.getElementById('successTotalPoints').textContent = totalPoints;
+            document.getElementById('successTotalViolations').textContent = totalViolations;
+        }
+
+        // Start new challenge function
+        function startNewChallenge() {
+            document.getElementById('successScreen').classList.remove('active');
+            document.getElementById('setupScreen').style.display = 'block';
+            
+            isPaused = false;
+            
+            const pauseBtn = document.getElementById('pauseBtn');
+            if (pauseBtn) {
+                pauseBtn.textContent = '⏸️ Pause';
+            }
+            updateHomeStats();  // ✅ NEW!
+        }
+
+        // Reset app function (not used anymore but keeping for safety)
+        function resetApp() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            isPaused = false;
+            
+            const pauseBtn = document.getElementById('pauseBtn');
+            if (pauseBtn) {
+                pauseBtn.textContent = '⏸️ Pause';
+            }
+            
+            document.getElementById('challengeScreen').classList.remove('active');
+            document.getElementById('successScreen').classList.remove('active');
+            document.getElementById('setupScreen').style.display = 'block';
+            
+            timeRemaining = 0;
+        }
+        // ✅ NEW: Load data when page loads
+        window.addEventListener('load', function() {
+            loadData();
+        });
+
+        // ✅ NEW: Page Visibility API - Detect tab changes
+        document.addEventListener('visibilitychange', function() {
+            // Only act if challenge is active and not already paused
+            if (!challengeActive || isPaused) {
+                return;
+            }
+            
+            if (document.hidden) {
+                // ═══════════════════════════════════════
+                // USER LEFT THE TAB
+                // ═══════════════════════════════════════
+                tabLeftTime = Date.now();
+                wasTabHidden = true;
+                
+                console.log('⚠️ Tab hidden - User left the app');
+                
+                if (userPlatform === 'web') {
+                    // WEB: Auto-pause with warning
+                    pauseTimer();
+                    showTabChangeWarning('web');
+                    
+                } else if (userPlatform === 'android') {
+                    // ANDROID: Immediate violation
+                    console.log('🤖 ANDROID: Tab change = Violation!');
+                    reportViolation();
+                    
+                } else if (userPlatform === 'ios') {
+                    // iOS: Just track the time, will check on return
+                    console.log('🍎 iOS: Tab change detected, tracking time...');
+                }
+                
+            } else {
+                // ═══════════════════════════════════════
+                // USER RETURNED TO THE TAB
+                // ═══════════════════════════════════════
+                
+                if (!wasTabHidden) return;  // Ignore if wasn't hidden
+                
+                console.log('✅ Tab visible - User returned');
+                
+                if (userPlatform === 'ios' && tabLeftTime && challengeActive) {
+                    // iOS: Check if returned before challenge ended
+                    let now = Date.now();
+                    
+                    if (now < challengeEndTime) {
+                        // Returned BEFORE challenge ended = VIOLATION
+                        console.log('🍎 iOS VIOLATION: Returned before challenge ended!');
+                        showTabChangeWarning('ios-violation');
+                        
+                        setTimeout(() => {
+                            reportViolation();
+                        }, 2000);  // 2 second delay to show warning
+                    } else {
+                        // Returned AFTER challenge ended = OK
+                        console.log('🍎 iOS: Returned after challenge ended - OK!');
+                    }
+                }
+                
+                // Reset tracking
+                tabLeftTime = null;
+                wasTabHidden = false;
+            }
+        });
+    </script>
+</body>
+</html>
