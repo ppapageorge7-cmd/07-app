@@ -227,6 +227,94 @@
             padding-top: 20px;
             border-top: 2px solid #e2e8f0;
         }
+             /* ✅ MOBILE RESPONSIVE - Add this at the end */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .app-container {
+                padding: 20px;
+                border-radius: 16px;
+                max-width: 100%;
+            }
+
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .header p {
+                font-size: 16px;
+            }
+
+            /* Duration buttons - 3 per row on mobile */
+            .duration-options {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 8px;
+            }
+
+            .duration-btn {
+                padding: 12px 8px;
+            }
+
+            .duration-btn .time {
+                font-size: 20px;
+            }
+
+            .duration-btn .label {
+                font-size: 12px;
+            }
+
+            /* Timer display smaller */
+            .timer-display {
+                font-size: 64px;
+                margin: 20px 0;
+            }
+
+            /* Buttons */
+            .start-btn {
+                padding: 16px;
+                font-size: 18px;
+            }
+
+            .btn {
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            /* Stats preview */
+            .stats-display {
+                font-size: 16px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+
+            /* Success screen */
+            .success-box {
+                padding: 20px;
+            }
+
+            .points-earned-value {
+                font-size: 36px;
+            }
+        }
+
+        /* Extra small phones */
+        @media (max-width: 400px) {
+            .duration-options {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+
+            .timer-display {
+                font-size: 48px;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+        }
     </style>
 </head>
 <body>
