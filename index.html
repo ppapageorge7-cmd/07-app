@@ -346,6 +346,12 @@
             }
         }
     </style>
+
+    <!-- ✅ Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 </head>
 <body>
     <div class="app-container">
@@ -354,6 +360,8 @@
             <div class="header">
                 <h1>07 📱</h1>
                 <p>Challenge yourself to put your phone down</p>
+                <!-- ✅ NEW: Show username -->
+                <p id="welcomeMessage" style="font-size: 14px; color: #10b981; margin-top: 8px;"></p>
             </div>
 
             <!-- ✅ NEW: Quick Stats Preview -->
@@ -542,10 +550,320 @@
                 <button class="btn btn-danger" onclick="resetAllData()" style="width: 100%; padding: 15px; border-radius: 12px;">
                     🔄 Reset All Data
                 </button>
+                <!-- ✅ NEW: Logout from Stats -->
+                <button class="btn btn-secondary" onclick="logoutUser()" style="width: 100%; padding: 15px; border-radius: 12px;">
+                    👋 Logout
+                </button>
+            </div>
+        </div>
+        <!-- ✅ NEW: Login Screen -->
+        <div id="loginScreen" class="challenge-screen active">
+            <div class="header">
+                <h1>07 📱</h1>
+                <h2 style="color: #667eea; font-size: 28px; margin-bottom: 10px;">Welcome Back</h2>
+                <p style="color: #64748b;">Login to continue your journey</p>
+            </div>
+
+            <div style="max-width: 400px; margin: 0 auto;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Email</label>
+                    <input type="email" id="loginEmail" placeholder="your@email.com" 
+                           style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Password</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" 
+                           style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;">
+                </div>
+
+                <div id="loginError" style="display: none; background: #fee; border: 1px solid #fcc; color: #c33; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px;">
+                </div>
+
+                <button class="start-btn" onclick="loginUser()" style="margin-bottom: 16px;">
+                    🔐 Login
+                </button>
+
+                <div style="text-align: center; color: #64748b;">
+                    Don't have an account? 
+                    <a href="#" onclick="showSignup(); return false;" style="color: #667eea; font-weight: 600; text-decoration: none;">Sign up</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ✅ NEW: Signup Screen -->
+        <div id="signupScreen" class="challenge-screen">
+            <div class="header">
+                <h1>07 📱</h1>
+                <h2 style="color: #667eea; font-size: 28px; margin-bottom: 10px;">Create Account</h2>
+                <p style="color: #64748b;">Start your phone detox journey</p>
+            </div>
+
+            <div style="max-width: 400px; margin: 0 auto;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Username</label>
+                    <input type="text" id="signupUsername" placeholder="johndoe" 
+                           style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Email</label>
+                    <input type="email" id="signupEmail" placeholder="your@email.com" 
+                           style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Password</label>
+                    <input type="password" id="signupPassword" placeholder="••••••••" 
+                           style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;">
+                    <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">At least 6 characters</p>
+                </div>
+
+                <div id="signupError" style="display: none; background: #fee; border: 1px solid #fcc; color: #c33; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px;">
+                </div>
+
+                <button class="start-btn" onclick="signupUser()" style="margin-bottom: 16px;">
+                    🚀 Create Account
+                </button>
+
+                <div style="text-align: center; color: #64748b;">
+                    Already have an account? 
+                    <a href="#" onclick="showLogin(); return false;" style="color: #667eea; font-weight: 600; text-decoration: none;">Login</a>
+                </div>
             </div>
         </div>
     </div>
     </div>
+
+    <script>
+
+        // ✅ Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJ7DuQHQru0pvVo-P9k_AO3oyCxnU_afo",
+            authDomain: "app-3bd7f.firebaseapp.com",
+            projectId: "app-3bd7f",
+            storageBucket: "app-3bd7f.firebasestorage.app",
+            messagingSenderId: "639284238815",
+            appId: "1:639284238815:web:52a82681746f7e3ec64c6a",
+            measurementId: "G-VJGQ8DWJFE"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        console.log('🔥 Firebase initialized!');
+
+    </script>
+
+    <!-- ✅ Authentication Functions -->
+    <script>
+        // Auth state variable
+        let currentUser = null;
+
+        // Check if user is already logged in
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                // User is signed in
+                currentUser = user;
+                console.log('✅ User logged in:', user.email);
+                showMainApp();
+            } else {
+                // User is signed out
+                currentUser = null;
+                console.log('👋 No user logged in');
+                showLogin();
+            }
+        });
+
+        // Show Login Screen
+        function showLogin() {
+            hideAllScreens();
+            document.getElementById('loginScreen').classList.add('active');
+            
+            // ✅ Reset form
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            
+            // ✅ Reset button state
+            const loginBtn = document.querySelector('#loginScreen button.start-btn');
+            if (loginBtn) {
+                loginBtn.textContent = '🔐 Login';
+                loginBtn.disabled = false;
+            }
+            
+            // ✅ Hide any errors
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        // Show Signup Screen
+        function showSignup() {
+            hideAllScreens();
+            document.getElementById('signupScreen').classList.add('active');
+            
+            // ✅ Reset form
+            document.getElementById('signupUsername').value = '';
+            document.getElementById('signupEmail').value = '';
+            document.getElementById('signupPassword').value = '';
+            
+            // ✅ Reset button state
+            const signupBtn = document.querySelector('#signupScreen button.start-btn');
+            if (signupBtn) {
+                signupBtn.textContent = '🚀 Create Account';
+                signupBtn.disabled = false;
+            }
+            
+            // ✅ Hide any errors
+            document.getElementById('signupError').style.display = 'none';
+        }
+
+        // Show Main App (Setup Screen)
+        function showMainApp() {
+            hideAllScreens();
+            document.getElementById('setupScreen').style.display = 'block';
+            // ✅ Show welcome message
+            if (currentUser) {
+                const username = currentUser.displayName || 'User';
+                document.getElementById('welcomeMessage').textContent = `Welcome back, ${username}! 👋`;
+            }
+            loadData();  // Load user's saved data
+        }
+
+        // Hide All Screens
+        function hideAllScreens() {
+            document.getElementById('setupScreen').style.display = 'none';
+            document.getElementById('challengeScreen').classList.remove('active');
+            document.getElementById('successScreen').classList.remove('active');
+            document.getElementById('statsScreen').classList.remove('active');
+            document.getElementById('loginScreen').classList.remove('active');
+            document.getElementById('signupScreen').classList.remove('active');
+        }
+
+        // Login User
+        function loginUser() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showError('loginError', 'Please fill in all fields');
+                return;
+            }
+
+            // Show loading state
+            const btn = event.target;
+            btn.textContent = '🔐 Logging in...';
+            btn.disabled = true;
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Success!
+                    console.log('✅ Login successful!');
+                    // Auth state listener will handle showing main app
+                })
+                .catch((error) => {
+                    // Error
+                    console.error('❌ Login error:', error);
+                    showError('loginError', getErrorMessage(error.code));
+                    btn.textContent = '🔐 Login';
+                    btn.disabled = false;
+                });
+        }
+
+        // Signup User
+        function signupUser() {
+            const username = document.getElementById('signupUsername').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+
+            if (!username || !email || !password) {
+                showError('signupError', 'Please fill in all fields');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('signupError', 'Password must be at least 6 characters');
+                return;
+            }
+
+            // Show loading state
+            const btn = event.target;
+            btn.textContent = '🚀 Creating account...';
+            btn.disabled = true;
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Success!
+                    console.log('✅ Signup successful!');
+                    
+                    // Update profile with username
+                    return userCredential.user.updateProfile({
+                        displayName: username
+                    });
+                })
+                .then(() => {
+                    console.log('✅ Username set!');
+                    // Auth state listener will handle showing main app
+                })
+                .catch((error) => {
+                    // Error
+                    console.error('❌ Signup error:', error);
+                    showError('signupError', getErrorMessage(error.code));
+                    btn.textContent = '🚀 Create Account';
+                    btn.disabled = false;
+                });
+        }
+
+        // Logout User
+        function logoutUser() {
+        if (confirm('Are you sure you want to logout?')) {
+        auth.signOut()
+            .then(() => {
+                console.log('👋 Logged out');
+                // Clear any stored data
+                currentUser = null;
+                // Show login screen
+                hideAllScreens();
+                document.getElementById('loginScreen').classList.add('active');
+            })
+            .catch((error) => {
+                console.error('❌ Logout error:', error);
+                alert('Error logging out: ' + error.message);
+            });
+         }
+        }
+
+        // Show Error Message
+        function showError(elementId, message) {
+            const errorDiv = document.getElementById(elementId);
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Get User-Friendly Error Messages
+        function getErrorMessage(errorCode) {
+            switch (errorCode) {
+                case 'auth/invalid-email':
+                    return 'Invalid email address';
+                case 'auth/user-not-found':
+                    return 'No account found with this email';
+                case 'auth/wrong-password':
+                    return 'Incorrect password';
+                case 'auth/email-already-in-use':
+                    return 'Email already registered';
+                case 'auth/weak-password':
+                    return 'Password should be at least 6 characters';
+                case 'auth/network-request-failed':
+                    return 'Network error. Please check your connection';
+                default:
+                    return 'An error occurred. Please try again';
+            }
+        }
+    </script>
 
     <script>
         // State variables
@@ -986,69 +1304,7 @@
             loadData();
         });
 
-        // ✅ NEW: Page Visibility API - Detect tab changes
-        document.addEventListener('visibilitychange', function() {
-            // Only act if challenge is active and not already paused
-            if (!challengeActive || isPaused) {
-                return;
-            }
-            
-            if (document.hidden) {
-                // ═══════════════════════════════════════
-                // USER LEFT THE TAB
-                // ═══════════════════════════════════════
-                tabLeftTime = Date.now();
-                wasTabHidden = true;
-                
-                console.log('⚠️ Tab hidden - User left the app');
-                
-                if (userPlatform === 'web') {
-                    // WEB: Auto-pause with warning
-                    pauseTimer();
-                    showTabChangeWarning('web');
-                    
-                } else if (userPlatform === 'android') {
-                    // ANDROID: Immediate violation
-                    console.log('🤖 ANDROID: Tab change = Violation!');
-                    reportViolation();
-                    
-                } else if (userPlatform === 'ios') {
-                    // iOS: Just track the time, will check on return
-                    console.log('🍎 iOS: Tab change detected, tracking time...');
-                }
-                
-            } else {
-                // ═══════════════════════════════════════
-                // USER RETURNED TO THE TAB
-                // ═══════════════════════════════════════
-                
-                if (!wasTabHidden) return;  // Ignore if wasn't hidden
-                
-                console.log('✅ Tab visible - User returned');
-                
-                if (userPlatform === 'ios' && tabLeftTime && challengeActive) {
-                    // iOS: Check if returned before challenge ended
-                    let now = Date.now();
-                    
-                    if (now < challengeEndTime) {
-                        // Returned BEFORE challenge ended = VIOLATION
-                        console.log('🍎 iOS VIOLATION: Returned before challenge ended!');
-                        showTabChangeWarning('ios-violation');
-                        
-                        setTimeout(() => {
-                            reportViolation();
-                        }, 2000);  // 2 second delay to show warning
-                    } else {
-                        // Returned AFTER challenge ended = OK
-                        console.log('🍎 iOS: Returned after challenge ended - OK!');
-                    }
-                }
-                
-                // Reset tracking
-                tabLeftTime = null;
-                wasTabHidden = false;
-            }
-        });
+        
     </script>
 </body>
 </html>
