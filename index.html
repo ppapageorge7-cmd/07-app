@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>07 App - Phone Detox Challenge</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -116,7 +122,6 @@
             transform: translateY(0);
         }
 
-        /* Challenge Screen & Success Screen (hidden by default) */
         .challenge-screen {
             display: none;
             text-align: center;
@@ -202,7 +207,6 @@
             font-size: 14px;
         }
 
-        /* Success Screen Specific Styles */
         .success-box {
             background: #f8fafc;
             border-radius: 16px;
@@ -227,7 +231,8 @@
             padding-top: 20px;
             border-top: 2px solid #e2e8f0;
         }
-             /* ✅ MOBILE RESPONSIVE */
+
+        /* Mobile Responsive */
         @media (max-width: 600px) {
             body {
                 padding: 10px;
@@ -247,7 +252,6 @@
                 font-size: 14px;
             }
 
-            /* ✅ CRITICAL: Duration buttons σε 3 columns */
             .duration-options {
                 grid-template-columns: repeat(3, 1fr) !important;
                 gap: 8px;
@@ -265,40 +269,23 @@
                 font-size: 11px;
             }
 
-            /* Timer display smaller */
             .timer-display {
                 font-size: 56px !important;
                 margin: 20px 0;
             }
 
-            /* Stats preview - compact */
-            div[style*="background: #f8fafc"] {
-                padding: 12px !important;
-                margin-bottom: 16px !important;
-            }
-
-            div[style*="font-size: 24px"] {
-                font-size: 20px !important;
-            }
-
-            /* Buttons */
             .start-btn {
-                padding: 14px;
-                font-size: 16px;
-            }
-
-            button[style*="margin-top: 10px"] {
-                margin-top: 8px !important;
+                padding: 16px;
+                font-size: 18px;
             }
 
             .btn {
                 padding: 12px;
-                font-size: 15px;
+                font-size: 16px;
             }
 
-            /* Stats display during challenge */
             .stats-display {
-                font-size: 14px;
+                font-size: 16px;
                 margin: 15px 0;
             }
 
@@ -310,23 +297,16 @@
                 font-size: 11px;
             }
 
-            /* Success screen */
             .success-box {
-                padding: 16px;
+                padding: 20px;
                 margin: 20px 0;
             }
 
             .points-earned-value {
-                font-size: 32px !important;
-            }
-
-            /* Stats screen */
-            div[style*="font-size: 48px"] {
                 font-size: 36px !important;
             }
         }
 
-        /* ✅ VERY SMALL PHONES - 2 columns */
         @media (max-width: 380px) {
             .duration-options {
                 grid-template-columns: repeat(2, 1fr) !important;
@@ -346,56 +326,37 @@
             }
         }
     </style>
-
-    <!-- ✅ Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
 </head>
 <body>
+
+    
     <div class="app-container">
-        <!-- Setup Screen -->
-        <div id="setupScreen" class="setup-screen">
+
+
+<!-- Setup Screen -->
+        <div id="setupScreen" class="setup-screen" style="display: none;">
             <div class="header">
                 <h1>07 📱</h1>
                 <p>Challenge yourself to put your phone down</p>
-                <!-- ✅ NEW: Show username -->
                 <p id="welcomeMessage" style="font-size: 14px; color: #10b981; margin-top: 8px;"></p>
             </div>
 
-            <!-- ✅ NEW: Quick Stats Preview -->
-        <div style="background: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 20px; display: flex; justify-content: space-around; text-align: center;">
-            <div>
-                <div style="font-size: 24px; font-weight: bold; color: #667eea;" id="homePoints">0</div>
-                <div style="font-size: 12px; color: #64748b;">Points</div>
-            </div>
-            <div>
-                <div style="font-size: 24px; font-weight: bold; color: #10b981;" id="homeSuccessRate">0%</div>
-                <div style="font-size: 12px; color: #64748b;">Success</div>
-            </div>
-            <div>
-                <div style="font-size: 24px; font-weight: bold; color: #64748b;" id="homeChallenges">0</div>
-                <div style="font-size: 12px; color: #64748b;">Challenges</div>
-            </div>
-        </div>
-            <div class="challenge-setup">
-                <!-- ✅ NEW: Platform Selector -->
-                <label>Platform Mode (Demo):</label>
-                <div class="duration-options" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
-                    <div class="duration-btn selected" onclick="selectPlatform('web', this)" id="platformWeb">
-                        <span class="time">🌐</span>
-                        <span class="label">Web</span>
-                    </div>
-                    <div class="duration-btn" onclick="selectPlatform('android', this)" id="platformAndroid">
-                        <span class="time">🤖</span>
-                        <span class="label">Android</span>
-                    </div>
-                    <div class="duration-btn" onclick="selectPlatform('ios', this)" id="platformIOS">
-                        <span class="time">🍎</span>
-                        <span class="label">iOS</span>
-                    </div>
+            <div style="background: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 20px; display: flex; justify-content: space-around; text-align: center;">
+                <div>
+                    <div style="font-size: 24px; font-weight: bold; color: #667eea;" id="homePoints">0</div>
+                    <div style="font-size: 12px; color: #64748b;">Points</div>
                 </div>
+                <div>
+                    <div style="font-size: 24px; font-weight: bold; color: #10b981;" id="homeSuccessRate">0%</div>
+                    <div style="font-size: 12px; color: #64748b;">Success</div>
+                </div>
+                <div>
+                    <div style="font-size: 24px; font-weight: bold; color: #64748b;" id="homeChallenges">0</div>
+                    <div style="font-size: 12px; color: #64748b;">Challenges</div>
+                </div>
+            </div>
+
+            <div class="challenge-setup">
                 <label>Choose Duration:</label>
                 <div class="duration-options">
                     <div class="duration-btn selected" onclick="selectDuration(7, this)">
@@ -424,28 +385,29 @@
                     🎯 Solo Challenge
                 </button>
 
-                <button class="start-btn" onclick="showComingSoon()" style="background: #94a3b8; margin-top: 10px;">
+                <button class="start-btn" onclick="alert('Coming Soon!')" style="background: #94a3b8; margin-top: 10px;">
                     👥 Challenge with Friends
                     <div style="font-size: 14px; font-weight: normal; margin-top: 5px;">Coming Soon!</div>
                 </button>
 
-                <!-- ΕΔΩ ΕΙΝΑΙ! ✅ -->
                 <button class="start-btn" onclick="showStats()" style="background: linear-gradient(135deg, #10b981, #059669); margin-top: 10px;">
                     📊 View Stats
                 </button>
-              </div>
+
+                <button class="start-btn" onclick="logoutUser()" style="background: #64748b; margin-top: 10px;">
+                    👋 Logout
+                </button>
+            </div>
         </div>
 
-        <!-- Challenge Screen (hidden initially) -->
+        <!-- Challenge Screen -->
         <div id="challengeScreen" class="challenge-screen">
             <div class="header">
                 <h1>📱 Challenge Active</h1>
                 <p class="challenge-message">Put your phone down!</p>
             </div>
 
-            <div class="timer-display" id="timerDisplay">
-                7:00
-            </div>
+            <div class="timer-display" id="timerDisplay">7:00</div>
 
             <div class="stats-display">
                 <div class="stat-item">
@@ -459,19 +421,13 @@
             </div>
 
             <div class="action-buttons">
-                <button class="btn btn-secondary" onclick="pauseTimer()" id="pauseBtn">
-                    ⏸️ Pause
-                </button>
-                <button class="btn btn-danger" onclick="reportViolation()">
-                    ⚠️ I Picked Up My Phone
-                </button>
-                <button class="btn btn-secondary" onclick="endChallenge()">
-                    End Challenge
-                </button>
+                <button class="btn btn-secondary" onclick="pauseTimer()" id="pauseBtn">⏸️ Pause</button>
+                <button class="btn btn-danger" onclick="reportViolation()">⚠️ I Picked Up My Phone</button>
+                <button class="btn btn-secondary" onclick="endChallenge()">End Challenge</button>
             </div>
         </div>
 
-        <!-- Success Screen (hidden initially) -->
+        <!-- Success Screen -->
         <div id="successScreen" class="challenge-screen">
             <div class="header">
                 <h1 id="successEmoji" style="font-size: 96px; margin-bottom: 10px;">🎉</h1>
@@ -497,15 +453,10 @@
                 </div>
             </div>
 
-            <button class="start-btn" onclick="startNewChallenge()">
-                🚀 Start New Challenge
-            </button>
-            <!-- ✅ NEW: Stats Button -->
-                <button class="start-btn" onclick="showStats()" style="background: linear-gradient(135deg, #10b981, #059669); margin-top: 10px;">
-                    📊 View Stats
-                </button>
+            <button class="start-btn" onclick="startNewChallenge()">🚀 Start New Challenge</button>
         </div>
-        <!-- ✅ NEW: Stats Screen -->
+
+        <!-- Stats Screen -->
         <div id="statsScreen" class="challenge-screen">
             <div class="header">
                 <h1 style="font-size: 64px;">📊</h1>
@@ -513,14 +464,11 @@
             </div>
 
             <div style="background: #f8fafc; border-radius: 16px; padding: 30px; margin: 30px 0;">
-                
-                <!-- Total Challenges -->
-                <div style="text-align: center; margin-bottom: 30px; padding-bottom: 30px; border-bottom: 2px solid #e2e8f0;">
+                <div style="text-align: center; margin-bottom: 30px; padding-bottom: 30px; border-top: 2px solid #e2e8f0;">
                     <div style="font-size: 48px; font-weight: bold; color: #667eea;" id="statsTotalChallenges">0</div>
                     <div style="color: #64748b; font-size: 18px;">Total Challenges</div>
                 </div>
 
-                <!-- Success Rate -->
                 <div style="text-align: center; margin-bottom: 30px; padding-bottom: 30px; border-bottom: 2px solid #e2e8f0;">
                     <div style="font-size: 48px; font-weight: bold; color: #10b981;" id="statsSuccessRate">0%</div>
                     <div style="color: #64748b; font-size: 18px;">Success Rate</div>
@@ -529,7 +477,6 @@
                     </div>
                 </div>
 
-                <!-- Grid Stats -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div style="text-align: center;">
                         <div style="font-size: 32px; font-weight: bold; color: #667eea;" id="statsTotalPoints">0</div>
@@ -542,21 +489,14 @@
                 </div>
             </div>
 
-            <!-- Buttons -->
             <div style="display: grid; gap: 10px;">
-                <button class="start-btn" onclick="closeStats()">
-                    ← Back to Home
-                </button>
-                <button class="btn btn-danger" onclick="resetAllData()" style="width: 100%; padding: 15px; border-radius: 12px;">
-                    🔄 Reset All Data
-                </button>
-                <!-- ✅ NEW: Logout from Stats -->
-                <button class="btn btn-secondary" onclick="logoutUser()" style="width: 100%; padding: 15px; border-radius: 12px;">
-                    👋 Logout
-                </button>
+                <button class="start-btn" onclick="closeStats()">← Back to Home</button>
+                <button class="btn btn-danger" onclick="resetAllData()" style="width: 100%; padding: 15px; border-radius: 12px;">🔄 Reset All Data</button>
+                <button class="btn btn-secondary" onclick="logoutUser()" style="width: 100%; padding: 15px; border-radius: 12px;">👋 Logout</button>
             </div>
         </div>
-        <!-- ✅ NEW: Login Screen -->
+
+        <!-- Login Screen -->
         <div id="loginScreen" class="challenge-screen active">
             <div class="header">
                 <h1>07 📱</h1>
@@ -577,12 +517,9 @@
                            style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;">
                 </div>
 
-                <div id="loginError" style="display: none; background: #fee; border: 1px solid #fcc; color: #c33; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px;">
-                </div>
+                <div id="loginError" style="display: none; background: #fee; border: 1px solid #fcc; color: #c33; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px;"></div>
 
-                <button class="start-btn" onclick="loginUser()" style="margin-bottom: 16px;">
-                    🔐 Login
-                </button>
+                <button class="start-btn" onclick="loginUser()" style="margin-bottom: 16px;">🔐 Login</button>
 
                 <div style="text-align: center; color: #64748b;">
                     Don't have an account? 
@@ -591,7 +528,7 @@
             </div>
         </div>
 
-        <!-- ✅ NEW: Signup Screen -->
+        <!-- Signup Screen -->
         <div id="signupScreen" class="challenge-screen">
             <div class="header">
                 <h1>07 📱</h1>
@@ -619,12 +556,9 @@
                     <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">At least 6 characters</p>
                 </div>
 
-                <div id="signupError" style="display: none; background: #fee; border: 1px solid #fcc; color: #c33; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px;">
-                </div>
+                <div id="signupError" style="display: none; background: #fee; border: 1px solid #fcc; color: #c33; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px;"></div>
 
-                <button class="start-btn" onclick="signupUser()" style="margin-bottom: 16px;">
-                    🚀 Create Account
-                </button>
+                <button class="start-btn" onclick="signupUser()" style="margin-bottom: 16px;">🚀 Create Account</button>
 
                 <div style="text-align: center; color: #64748b;">
                     Already have an account? 
@@ -632,105 +566,85 @@
                 </div>
             </div>
         </div>
-    </div>
+
     </div>
 
+<!-- Firebase Configuration -->
     <script>
-
-        // ✅ Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAJ7DuQHQru0pvVo-P9k_AO3oyCxnU_afo",
             authDomain: "app-3bd7f.firebaseapp.com",
             projectId: "app-3bd7f",
             storageBucket: "app-3bd7f.firebasestorage.app",
             messagingSenderId: "639284238815",
-            appId: "1:639284238815:web:52a82681746f7e3ec64c6a",
-            measurementId: "G-VJGQ8DWJFE"
+            appId: "1:639284238815:web:52a82681746f7e3ec64c6a"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-
         console.log('🔥 Firebase initialized!');
-
     </script>
 
-    <!-- ✅ Authentication Functions -->
+    <!-- Authentication -->
     <script>
-        // Auth state variable
         let currentUser = null;
 
-        // Check if user is already logged in
         auth.onAuthStateChanged(function(user) {
             if (user) {
-                // User is signed in
                 currentUser = user;
                 console.log('✅ User logged in:', user.email);
                 showMainApp();
             } else {
-                // User is signed out
                 currentUser = null;
                 console.log('👋 No user logged in');
                 showLogin();
             }
         });
 
-        // Show Login Screen
         function showLogin() {
             hideAllScreens();
             document.getElementById('loginScreen').classList.add('active');
-            
-            // ✅ Reset form
             document.getElementById('loginEmail').value = '';
             document.getElementById('loginPassword').value = '';
-            
-            // ✅ Reset button state
             const loginBtn = document.querySelector('#loginScreen button.start-btn');
             if (loginBtn) {
                 loginBtn.textContent = '🔐 Login';
                 loginBtn.disabled = false;
             }
-            
-            // ✅ Hide any errors
             document.getElementById('loginError').style.display = 'none';
         }
 
-        // Show Signup Screen
         function showSignup() {
             hideAllScreens();
             document.getElementById('signupScreen').classList.add('active');
-            
-            // ✅ Reset form
             document.getElementById('signupUsername').value = '';
             document.getElementById('signupEmail').value = '';
             document.getElementById('signupPassword').value = '';
-            
-            // ✅ Reset button state
             const signupBtn = document.querySelector('#signupScreen button.start-btn');
             if (signupBtn) {
                 signupBtn.textContent = '🚀 Create Account';
                 signupBtn.disabled = false;
             }
-            
-            // ✅ Hide any errors
             document.getElementById('signupError').style.display = 'none';
         }
 
-        // Show Main App (Setup Screen)
-        function showMainApp() {
+        async function showMainApp() {
             hideAllScreens();
             document.getElementById('setupScreen').style.display = 'block';
-            // ✅ Show welcome message
+            
             if (currentUser) {
                 const username = currentUser.displayName || 'User';
-                document.getElementById('welcomeMessage').textContent = `Welcome back, ${username}! 👋`;
+                const welcomeMsg = document.getElementById('welcomeMessage');
+                if (welcomeMsg) {
+                    welcomeMsg.textContent = `Welcome back, ${username}! 👋`;
+                }
+                
+                await migrateLocalStorageToFirestore();
+                await loadStatsFromFirestore();
             }
-            loadData();  // Load user's saved data
         }
 
-        // Hide All Screens
         function hideAllScreens() {
             document.getElementById('setupScreen').style.display = 'none';
             document.getElementById('challengeScreen').classList.remove('active');
@@ -740,7 +654,6 @@
             document.getElementById('signupScreen').classList.remove('active');
         }
 
-        // Login User
         function loginUser() {
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
@@ -750,19 +663,15 @@
                 return;
             }
 
-            // Show loading state
             const btn = event.target;
             btn.textContent = '🔐 Logging in...';
             btn.disabled = true;
 
             auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Success!
+                .then(() => {
                     console.log('✅ Login successful!');
-                    // Auth state listener will handle showing main app
                 })
                 .catch((error) => {
-                    // Error
                     console.error('❌ Login error:', error);
                     showError('loginError', getErrorMessage(error.code));
                     btn.textContent = '🔐 Login';
@@ -770,7 +679,6 @@
                 });
         }
 
-        // Signup User
         function signupUser() {
             const username = document.getElementById('signupUsername').value.trim();
             const email = document.getElementById('signupEmail').value.trim();
@@ -786,27 +694,21 @@
                 return;
             }
 
-            // Show loading state
             const btn = event.target;
             btn.textContent = '🚀 Creating account...';
             btn.disabled = true;
 
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
-                    // Success!
                     console.log('✅ Signup successful!');
-                    
-                    // Update profile with username
                     return userCredential.user.updateProfile({
                         displayName: username
                     });
                 })
                 .then(() => {
                     console.log('✅ Username set!');
-                    // Auth state listener will handle showing main app
                 })
                 .catch((error) => {
-                    // Error
                     console.error('❌ Signup error:', error);
                     showError('signupError', getErrorMessage(error.code));
                     btn.textContent = '🚀 Create Account';
@@ -814,37 +716,30 @@
                 });
         }
 
-        // Logout User
         function logoutUser() {
-        if (confirm('Are you sure you want to logout?')) {
-        auth.signOut()
-            .then(() => {
-                console.log('👋 Logged out');
-                // Clear any stored data
-                currentUser = null;
-                // Show login screen
-                hideAllScreens();
-                document.getElementById('loginScreen').classList.add('active');
-            })
-            .catch((error) => {
-                console.error('❌ Logout error:', error);
-                alert('Error logging out: ' + error.message);
-            });
-         }
+            if (confirm('Are you sure you want to logout?')) {
+                auth.signOut()
+                    .then(() => {
+                        console.log('👋 Logged out');
+                        currentUser = null;
+                        hideAllScreens();
+                        document.getElementById('loginScreen').classList.add('active');
+                    })
+                    .catch((error) => {
+                        console.error('❌ Logout error:', error);
+                    });
+            }
         }
 
-        // Show Error Message
         function showError(elementId, message) {
             const errorDiv = document.getElementById(elementId);
             errorDiv.textContent = message;
             errorDiv.style.display = 'block';
-            
             setTimeout(() => {
                 errorDiv.style.display = 'none';
             }, 5000);
         }
 
-        // Get User-Friendly Error Messages
         function getErrorMessage(errorCode) {
             switch (errorCode) {
                 case 'auth/invalid-email':
@@ -857,95 +752,107 @@
                     return 'Email already registered';
                 case 'auth/weak-password':
                     return 'Password should be at least 6 characters';
-                case 'auth/network-request-failed':
-                    return 'Network error. Please check your connection';
+                case 'auth/invalid-credential':
+                    return 'Invalid email or password';
                 default:
                     return 'An error occurred. Please try again';
             }
         }
     </script>
 
+    <!-- App Logic -->
     <script>
-        // State variables
         let selectedDuration = 7;
         let timeRemaining = 0;
         let timerInterval = null;
         let isPaused = false;
         let totalPoints = 0;
         let totalViolations = 0;
-        let totalChallenges = 0;        // ✅ NEW
-        let completedChallenges = 0;    // ✅ NEW
-        let challengeEndTime = null;  // ✅ NEW - Timestamp when challenge should end
+        let totalChallenges = 0;
+        let completedChallenges = 0;
+        let challengeEndTime = null;
 
-        // ✅ NEW: Platform & Visibility Detection
-        let userPlatform = 'web';  // 'web', 'android', 'ios'
-        let tabLeftTime = null;
-        let wasTabHidden = false;
+        console.log('✅ Variables initialized');
 
-        // ✅ NEW: localStorage Functions
-        function saveData() {
-            localStorage.setItem('totalPoints', totalPoints);
-            localStorage.setItem('totalViolations', totalViolations);
-            localStorage.setItem('totalChallenges', totalChallenges);
-            localStorage.setItem('completedChallenges', completedChallenges);
+        async function saveStatsToFirestore() {
+            if (!currentUser) {
+                console.log('⚠️ No user logged in');
+                return;
+            }
+            try {
+                await db.collection('users').doc(currentUser.uid).collection('stats').doc('current').set({
+                    totalPoints: totalPoints,
+                    totalViolations: totalViolations,
+                    totalChallenges: totalChallenges,
+                    completedChallenges: completedChallenges,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                console.log('💾 Stats saved to Firestore!');
+            } catch (error) {
+                console.error('❌ Error saving:', error);
+            }
         }
 
-        function loadData() {
-            // Load από localStorage (αν υπάρχει)
-            let savedPoints = localStorage.getItem('totalPoints');
-            let savedViolations = localStorage.getItem('totalViolations');
-            let savedTotalChallenges = localStorage.getItem('totalChallenges');
-            let savedCompleted = localStorage.getItem('completedChallenges');
-            
-            // Αν υπάρχουν saved data, φόρτωσέ τα
-            if (savedPoints !== null) {
-                totalPoints = parseInt(savedPoints);
+        async function loadStatsFromFirestore() {
+            if (!currentUser) {
+                console.log('⚠️ No user logged in');
+                return;
             }
-            if (savedViolations !== null) {
-                totalViolations = parseInt(savedViolations);
+            try {
+                const doc = await db.collection('users').doc(currentUser.uid).collection('stats').doc('current').get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    totalPoints = data.totalPoints || 0;
+                    totalViolations = data.totalViolations || 0;
+                    totalChallenges = data.totalChallenges || 0;
+                    completedChallenges = data.completedChallenges || 0;
+                    console.log('✅ Stats loaded from Firestore:', data);
+                } else {
+                    totalPoints = 0;
+                    totalViolations = 0;
+                    totalChallenges = 0;
+                    completedChallenges = 0;
+                    console.log('🆕 New user - initializing stats');
+                    await saveStatsToFirestore();
+                }
+                updateAllDisplays();
+                updateHomeStats();
+            } catch (error) {
+                console.error('❌ Error loading:', error);
             }
-            if (savedTotalChallenges !== null) {
-                totalChallenges = parseInt(savedTotalChallenges);
-            }
-            if (savedCompleted !== null) {
-                completedChallenges = parseInt(savedCompleted);
-            }
+        }
 
-            // ✅ Update home screen stats preview
-            document.getElementById('homePoints').textContent = totalPoints;
-            document.getElementById('homeChallenges').textContent = totalChallenges;
-            
-            let successRate = 0;
-            if (totalChallenges > 0) {
-                successRate = Math.round((completedChallenges / totalChallenges) * 100);
+        async function migrateLocalStorageToFirestore() {
+            if (!currentUser) return;
+            try {
+                const doc = await db.collection('users').doc(currentUser.uid).collection('stats').doc('current').get();
+                if (!doc.exists && localStorage.getItem('totalPoints')) {
+                    totalPoints = parseInt(localStorage.getItem('totalPoints')) || 0;
+                    totalViolations = parseInt(localStorage.getItem('totalViolations')) || 0;
+                    totalChallenges = parseInt(localStorage.getItem('totalChallenges')) || 0;
+                    completedChallenges = parseInt(localStorage.getItem('completedChallenges')) || 0;
+                    console.log('🔄 Migrating localStorage...');
+                    await saveStatsToFirestore();
+                    localStorage.clear();
+                    console.log('✅ Migration complete!');
+                }
+            } catch (error) {
+                console.error('❌ Migration error:', error);
             }
-            document.getElementById('homeSuccessRate').textContent = successRate + '%';
-            
-            
-            // Update τα displays
-            updateAllDisplays();
-            updateHomeStats();  // ✅ NEW!
         }
 
         function updateAllDisplays() {
-            // Update όλα τα displays με τα current data
             document.getElementById('pointsDisplay').textContent = totalPoints;
             document.getElementById('violationsDisplay').textContent = totalViolations;
         }
 
         function updateHomeStats() {
-            // Update home screen stats preview
             const homePoints = document.getElementById('homePoints');
             const homeChallenges = document.getElementById('homeChallenges');
             const homeSuccessRate = document.getElementById('homeSuccessRate');
             
-            // Check αν υπάρχουν (γιατί μπορεί να μην έχεις προσθέσει το preview ακόμα)
-            if (homePoints) {
-                homePoints.textContent = totalPoints;
-            }
-            if (homeChallenges) {
-                homeChallenges.textContent = totalChallenges;
-            }
+            if (homePoints) homePoints.textContent = totalPoints;
+            if (homeChallenges) homeChallenges.textContent = totalChallenges;
             if (homeSuccessRate) {
                 let successRate = 0;
                 if (totalChallenges > 0) {
@@ -954,295 +861,103 @@
                 homeSuccessRate.textContent = successRate + '%';
             }
         }
-        function resetAllData() {
-            if (confirm('Are you sure you want to reset ALL data? This cannot be undone!')) {
-                localStorage.clear();
-                totalPoints = 0;
-                totalViolations = 0;
-                totalChallenges = 0;
-                completedChallenges = 0;
-                updateAllDisplays();
-                updateHomeStats();  // ✅ NEW!
-                /// ✅ HIDE all screens
-                document.getElementById('statsScreen').classList.remove('active');
-                document.getElementById('challengeScreen').classList.remove('active');
-                document.getElementById('successScreen').classList.remove('active');
-        
-                // ✅ SHOW setup screen
-                document.getElementById('setupScreen').style.display = 'block';
-                alert('All data has been reset!');
-            }
-        }
 
-        function showStats() {
-            // ✅ HIDE setup screen completely
-            const setupScreen = document.getElementById('setupScreen');
-            setupScreen.style.display = 'none';
-            
-            // ✅ HIDE challenge screen (in case it's showing)
-            document.getElementById('challengeScreen').classList.remove('active');
-            
-            // ✅ HIDE success screen (in case it's showing)
-            document.getElementById('successScreen').classList.remove('active');
-            
-            // ✅ SHOW stats screen
-            document.getElementById('statsScreen').classList.add('active');
-            
-            // Calculate success rate
-            let successRate = 0;
-            if (totalChallenges > 0) {
-                successRate = Math.round((completedChallenges / totalChallenges) * 100);
-            }
-            
-            // Update stats displays
-            document.getElementById('statsTotalChallenges').textContent = totalChallenges;
-            document.getElementById('statsSuccessRate').textContent = successRate + '%';
-            document.getElementById('statsCompleted').textContent = completedChallenges;
-            document.getElementById('statsTotal').textContent = totalChallenges;
-            document.getElementById('statsTotalPoints').textContent = totalPoints;
-            document.getElementById('statsTotalViolations').textContent = totalViolations;
-        }
-
-        function closeStats() {
-            // Hide stats screen
-            document.getElementById('statsScreen').classList.remove('active');
-            
-            // Show setup screen
-            document.getElementById('setupScreen').style.display = 'block';
-
-            // ✅ Make sure other screens are hidden
-            document.getElementById('challengeScreen').classList.remove('active');
-            document.getElementById('successScreen').classList.remove('active');
-
-            updateHomeStats();  // ✅ NEW!
-        }
-
-        function showTabChangeWarning(type) {
-            // Create warning overlay
-            let warning = document.createElement('div');
-            warning.id = 'tabWarning';
-            warning.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.9);
-                color: white;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 10000;
-                animation: slideIn 0.3s ease-out;
-                text-align: center;
-                padding: 20px;
-            `;
-            
-            let content = '';
-            
-            if (type === 'web') {
-                content = `
-                    <div>
-                        <div style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
-                        <h2 style="font-size: 32px; margin-bottom: 20px;">Tab Changed!</h2>
-                        <p style="font-size: 18px; margin-bottom: 20px; opacity: 0.9;">
-                            You switched tabs during the challenge.<br>
-                            Timer has been automatically paused.
-                        </p>
-                        <p style="font-size: 16px; opacity: 0.7;">
-                            Click Resume when you're ready to continue.
-                        </p>
-                    </div>
-                `;
-            } else if (type === 'ios-violation') {
-                content = `
-                    <div>
-                        <div style="font-size: 64px; margin-bottom: 20px;">🍎</div>
-                        <h2 style="font-size: 32px; margin-bottom: 20px; color: #ef4444;">iOS Violation Detected!</h2>
-                        <p style="font-size: 18px; margin-bottom: 20px;">
-                            You returned to the app before the challenge ended.
-                        </p>
-                        <p style="font-size: 16px; opacity: 0.8;">
-                            On iOS, you must stay away for the full duration!
-                        </p>
-                    </div>
-                `;
-            }
-            
-            warning.innerHTML = content;
-            document.body.appendChild(warning);
-            
-            // Auto-remove after 3 seconds (except for web pause)
-            if (type !== 'web') {
-                setTimeout(() => {
-                    if (warning.parentElement) {
-                        warning.remove();
-                    }
-                }, 3000);
-            } else {
-                // For web, remove when user resumes
-                warning.onclick = () => warning.remove();
-            }
-        }
-
-        // Select duration function
         function selectDuration(minutes, element) {
             selectedDuration = minutes;
-            
             document.querySelectorAll('.duration-btn').forEach(btn => {
                 btn.classList.remove('selected');
             });
-            
             element.classList.add('selected');
         }
 
-        function selectPlatform(platform, element) {
-            userPlatform = platform;
-            
-            // Update UI
-            document.querySelectorAll('#platformWeb, #platformAndroid, #platformIOS').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            element.classList.add('selected');
-            
-            // Show info about selected platform
-            let info = '';
-            if (platform === 'web') {
-                info = '🌐 Web: Tab change pauses timer. Honor system + warnings.';
-            } else if (platform === 'android') {
-                info = '🤖 Android: Tab change = automatic violation. Full detection!';
-            } else if (platform === 'ios') {
-                info = '🍎 iOS: Return before time ends = violation. Lock screen OK.';
-            }
-            
-            console.log('Platform selected:', platform);
-            console.log(info);
-        }
-
-        // Start challenge function
         function startChallenge() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-            }
-            
+            if (timerInterval) clearInterval(timerInterval);
             isPaused = false;
-            
             document.getElementById('setupScreen').style.display = 'none';
             document.getElementById('challengeScreen').classList.add('active');
             
-            // ✅ NEW: Calculate exact end time
             challengeEndTime = Date.now() + (selectedDuration * 60 * 1000);
-            // Date.now() = τώρα σε milliseconds
-            // selectedDuration * 60 * 1000 = λεπτά σε milliseconds
-            
             updateTimerDisplay();
             
             timerInterval = setInterval(() => {
                 updateTimerDisplay();
-                
-                // ✅ NEW: Check based on actual time, not counter
-                let now = Date.now();
-                if (now >= challengeEndTime) {
+                if (Date.now() >= challengeEndTime) {
                     completeChallenge();
                 }
-            }, 100);   // ✅ Check every 100ms for more accuracy
+            }, 100);
         }
 
-        // Update timer display function
         function updateTimerDisplay() {
-            // ✅ NEW: Calculate time remaining based on timestamps
-            let now = Date.now();
-            timeRemaining = Math.max(0, Math.ceil((challengeEndTime - now) / 1000));
-
+            timeRemaining = Math.max(0, Math.ceil((challengeEndTime - Date.now()) / 1000));
             const minutes = Math.floor(timeRemaining / 60);
             const seconds = timeRemaining % 60;
-            const display = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
-            document.getElementById('timerDisplay').textContent = display;
+            document.getElementById('timerDisplay').textContent = 
+                minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
         }
 
-        // Pause/Resume timer function
         function pauseTimer() {
             if (isPaused) {
                 isPaused = false;
-                
-                if (timerInterval) {
-                    clearInterval(timerInterval);
-                }
-                // ✅ NEW: Recalculate end time based on remaining seconds
+                if (timerInterval) clearInterval(timerInterval);
                 challengeEndTime = Date.now() + (timeRemaining * 1000);
-
                 timerInterval = setInterval(() => {
                     updateTimerDisplay();
-                    
-                    let now = Date.now();
-                    if (now >= challengeEndTime) {
+                    if (Date.now() >= challengeEndTime) {
                         completeChallenge();
                     }
-                }, 100);;
-                
+                }, 100);
                 document.getElementById('pauseBtn').textContent = '⏸️ Pause';
             } else {
                 isPaused = true;
                 clearInterval(timerInterval);
-                // ✅ NEW: Update timeRemaining based on current time
                 updateTimerDisplay();
                 document.getElementById('pauseBtn').textContent = '▶️ Resume';
             }
         }
 
-        // Complete challenge function
-        function completeChallenge() {
+        async function completeChallenge() {
             clearInterval(timerInterval);
             timerInterval = null;
             
-            // Points για τα 5 durations
             let pointsEarned = 0;
-            if (selectedDuration === 7) {
-                pointsEarned = 25;
-            } else if (selectedDuration === 10) {
-                pointsEarned = 35;
-            } else if (selectedDuration === 15) {
-                pointsEarned = 50;
-            } else if (selectedDuration === 20) {
-                pointsEarned = 100;
-            } else if (selectedDuration === 30) {
-                pointsEarned = 150;
-            }
+            if (selectedDuration === 7) pointsEarned = 25;
+            else if (selectedDuration === 10) pointsEarned = 35;
+            else if (selectedDuration === 15) pointsEarned = 50;
+            else if (selectedDuration === 20) pointsEarned = 100;
+            else if (selectedDuration === 30) pointsEarned = 150;
             
-            totalPoints = totalPoints + pointsEarned;
-            totalChallenges = totalChallenges + 1;
-            completedChallenges = completedChallenges + 1;
+            totalPoints += pointsEarned;
+            totalChallenges++;
+            completedChallenges++;
             
             document.getElementById('pointsDisplay').textContent = totalPoints;
+            await saveStatsToFirestore();
+            updateHomeStats();
             
-            saveData();
-            updateHomeStats();  // ✅ NEW!
             showSuccessScreen(pointsEarned, true);
         }
 
-        // Report violation function
-        function reportViolation() {
+        async function reportViolation() {
             clearInterval(timerInterval);
             timerInterval = null;
             
-            totalViolations = totalViolations + 1;
-            totalChallenges = totalChallenges + 1;  // ✅ NEW
+            totalViolations++;
+            totalChallenges++;
+            
             document.getElementById('violationsDisplay').textContent = totalViolations;
-            saveData();  // ✅ NEW - Save after violation!
-            updateHomeStats();  // ✅ NEW!
-            console.log('🚨 Violation recorded - Platform:', userPlatform);  // ✅ NEW
+            await saveStatsToFirestore();
+            updateHomeStats();
             
             showSuccessScreen(0, false);
         }
 
-        // End challenge function
-        function endChallenge() {
+        async function endChallenge() {
             clearInterval(timerInterval);
             timerInterval = null;
+            await saveStatsToFirestore();
             showSuccessScreen(0, false);
         }
 
-        // Show success screen function
         function showSuccessScreen(pointsEarned, success) {
             document.getElementById('challengeScreen').classList.remove('active');
             document.getElementById('successScreen').classList.add('active');
@@ -1265,46 +980,60 @@
             document.getElementById('successTotalViolations').textContent = totalViolations;
         }
 
-        // Start new challenge function
         function startNewChallenge() {
             document.getElementById('successScreen').classList.remove('active');
             document.getElementById('setupScreen').style.display = 'block';
-            
             isPaused = false;
-            
             const pauseBtn = document.getElementById('pauseBtn');
-            if (pauseBtn) {
-                pauseBtn.textContent = '⏸️ Pause';
-            }
-            updateHomeStats();  // ✅ NEW!
+            if (pauseBtn) pauseBtn.textContent = '⏸️ Pause';
+            updateHomeStats();
         }
 
-        // Reset app function (not used anymore but keeping for safety)
-        function resetApp() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
+        function showStats() {
+            hideAllScreens();
+            document.getElementById('statsScreen').classList.add('active');
+            
+            let successRate = 0;
+            if (totalChallenges > 0) {
+                successRate = Math.round((completedChallenges / totalChallenges) * 100);
             }
             
-            isPaused = false;
-            
-            const pauseBtn = document.getElementById('pauseBtn');
-            if (pauseBtn) {
-                pauseBtn.textContent = '⏸️ Pause';
-            }
-            
-            document.getElementById('challengeScreen').classList.remove('active');
-            document.getElementById('successScreen').classList.remove('active');
+            document.getElementById('statsTotalChallenges').textContent = totalChallenges;
+            document.getElementById('statsSuccessRate').textContent = successRate + '%';
+            document.getElementById('statsCompleted').textContent = completedChallenges;
+            document.getElementById('statsTotal').textContent = totalChallenges;
+            document.getElementById('statsTotalPoints').textContent = totalPoints;
+            document.getElementById('statsTotalViolations').textContent = totalViolations;
+        }
+
+        function closeStats() {
+            document.getElementById('statsScreen').classList.remove('active');
             document.getElementById('setupScreen').style.display = 'block';
-            
-            timeRemaining = 0;
+            updateHomeStats();
         }
-        // ✅ NEW: Load data when page loads
-        window.addEventListener('load', function() {
-            loadData();
-        });
 
-        
+        async function resetAllData() {
+            if (confirm('Are you sure you want to reset ALL data? This cannot be undone!')) {
+                totalPoints = 0;
+                totalViolations = 0;
+                totalChallenges = 0;
+                completedChallenges = 0;
+                
+                updateAllDisplays();
+                updateHomeStats();
+                
+                if (currentUser) {
+                    await saveStatsToFirestore();
+                }
+                
+                document.getElementById('statsScreen').classList.remove('active');
+                document.getElementById('setupScreen').style.display = 'block';
+                
+                alert('✅ All data has been reset!');
+            }
+        }
+
+        console.log('✅ All functions loaded!');
     </script>
 </body>
 </html>
